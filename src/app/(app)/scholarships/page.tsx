@@ -1,7 +1,23 @@
+export const dynamic = "force-dynamic";
+
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { ScholarshipBoard } from "@/components/scholarships/scholarship-board";
+import prisma from "@/lib/prisma";
 import { getScholarships } from "./actions";
 
 export default async function ScholarshipsPage() {
+  const session = await auth();
+  if (session?.user?.id) {
+    const profile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+      select: { audienceSegment: true },
+    });
+    if (profile?.audienceSegment === "non_student") {
+      redirect("/home");
+    }
+  }
+
   const scholarships = await getScholarships();
 
   return (

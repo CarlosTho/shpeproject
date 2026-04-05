@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { auth } from "@/auth";
 import { DirectoryBoard } from "@/components/directory/directory-board";
 import { getDirectoryMembers } from "./actions";

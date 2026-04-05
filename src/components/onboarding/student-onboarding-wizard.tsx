@@ -24,22 +24,25 @@ function toggleInList(list: string[], item: string): string[] {
   return list.includes(item) ? list.filter((x) => x !== item) : [...list, item];
 }
 
+const inputClass =
+  "mt-1.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200";
+
 function Progress({ step }: { step: number }) {
   return (
-    <div className="mb-8 text-slate-900">
-      <div className="mb-2 flex flex-wrap justify-between gap-1 text-[0.65rem] font-medium sm:text-xs">
+    <div className="mb-8">
+      <div className="mb-2 flex flex-wrap justify-between gap-1 text-[11px] font-medium">
         {STEPS.map((label, i) => (
           <span
             key={label}
-            className={i <= step ? "text-teal-800" : "text-slate-500"}
+            className={i <= step ? "text-zinc-900" : "text-zinc-400"}
           >
             {i + 1}. {label}
           </span>
         ))}
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100">
         <div
-          className="h-full rounded-full bg-teal-600 transition-all duration-300"
+          className="h-full rounded-full bg-teal-500 transition-all duration-300"
           style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
         />
       </div>
@@ -146,36 +149,36 @@ export function StudentOnboardingWizard() {
   }
 
   return (
-    <div className="space-y-2 text-slate-900">
+    <div className="animate-fade-up space-y-2 text-zinc-900">
       <Progress step={step} />
 
       {step === 0 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">Education</h2>
-          <label className="block text-sm font-medium text-slate-700">
+          <h2 className="text-[15px] font-semibold text-zinc-900">Education</h2>
+          <label className="block text-[13px] font-medium text-zinc-800">
             What school do you attend?
             <input
               value={school}
               onChange={(e) => setSchool(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className={inputClass}
               placeholder="University or college"
             />
           </label>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Major or intended major
             <input
               value={major}
               onChange={(e) => setMajor(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className={inputClass}
               placeholder="e.g. Mechanical Engineering"
             />
           </label>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Graduation year
             <select
               value={gradYear}
               onChange={(e) => setGradYear(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+              className={inputClass}
             >
               <option value="">Select…</option>
               {GRAD_YEARS.map((y) => (
@@ -185,12 +188,12 @@ export function StudentOnboardingWizard() {
               ))}
             </select>
           </label>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Education level
             <select
               value={education}
               onChange={(e) => setEducation(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+              className={inputClass}
             >
               {EDUCATION_LEVELS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -204,43 +207,43 @@ export function StudentOnboardingWizard() {
 
       {step === 1 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">Background</h2>
+          <h2 className="text-[15px] font-semibold text-zinc-900">Background</h2>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               Do you identify as a first-generation college student?
             </legend>
-            <div className="mt-2 flex flex-wrap gap-4">
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <div className="mt-2.5 flex flex-wrap gap-4">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="firstGen"
                   checked={firstGen === true}
                   onChange={() => setFirstGen(true)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 Yes
               </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="firstGen"
                   checked={firstGen === false}
                   onChange={() => setFirstGen(false)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 No
               </label>
             </div>
           </fieldset>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               Preferred language
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {CONTENT_LANG_PREFS.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
@@ -251,19 +254,19 @@ export function StudentOnboardingWizard() {
                         o.value as "english" | "spanish" | "both",
                       )
                     }
-                    className="size-4 border-slate-300 text-teal-600"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  <span className="text-sm">{o.label}</span>
+                  <span className="text-[13px] text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+          <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
             <input
               type="checkbox"
               checked={internationalOrDaca}
               onChange={(e) => setInternationalOrDaca(e.target.checked)}
-              className="size-4 rounded border-slate-300 text-teal-600"
+              className="size-4 rounded border-zinc-300 accent-zinc-900"
             />
             International student or DACA (optional)
           </label>
@@ -272,60 +275,60 @@ export function StudentOnboardingWizard() {
 
       {step === 2 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-[15px] font-semibold text-zinc-900">
             Direction & goals
           </h2>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               What are you interested in?
             </legend>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
               {STUDENT_FIELD_INTEREST.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
                     name="field"
                     checked={studentFieldInterest === o.value}
                     onChange={() => setStudentFieldInterest(o.value)}
-                    className="size-4 border-slate-300 text-teal-600"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  {o.label}
+                  <span className="text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               What are you trying to do right now?
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {STUDENT_PRIMARY_GOAL.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
                     name="primary"
                     checked={studentPrimaryGoal === o.value}
                     onChange={() => setStudentPrimaryGoal(o.value)}
-                    className="size-4 border-slate-300 text-teal-600"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  {o.label}
+                  <span className="text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             What are you trying to achieve in the next 6 months?
             <textarea
               value={sixMonthGoal}
               onChange={(e) => setSixMonthGoal(e.target.value)}
               rows={3}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className="mt-1.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
               placeholder="Be specific — we use this to focus your roadmap and tips."
             />
           </label>
@@ -334,92 +337,92 @@ export function StudentOnboardingWizard() {
 
       {step === 3 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-[15px] font-semibold text-zinc-900">
             Scholarships, location & support
           </h2>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               Are you currently receiving scholarships?
             </legend>
-            <div className="mt-2 flex flex-wrap gap-4">
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <div className="mt-2.5 flex flex-wrap gap-4">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="recv"
                   checked={receivingScholarships === true}
                   onChange={() => setReceivingScholarships(true)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 Yes
               </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="recv"
                   checked={receivingScholarships === false}
                   onChange={() => setReceivingScholarships(false)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 No
               </label>
             </div>
           </fieldset>
           {receivingScholarships ? (
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-[13px] font-medium text-zinc-800">
               Scholarship names (optional)
               <input
                 value={scholarshipDetails}
                 onChange={(e) => setScholarshipDetails(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+                className={inputClass}
                 placeholder="e.g. SHPE National Scholarship"
               />
             </label>
           ) : null}
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               Are you looking for scholarships?
             </legend>
-            <div className="mt-2 flex flex-wrap gap-4">
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <div className="mt-2.5 flex flex-wrap gap-4">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="seek"
                   checked={seekingScholarships === true}
                   onChange={() => setSeekingScholarships(true)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 Yes
               </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="seek"
                   checked={seekingScholarships === false}
                   onChange={() => setSeekingScholarships(false)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 No
               </label>
             </div>
           </fieldset>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Where are you based?
             <input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className={inputClass}
               placeholder="City, state, or country"
             />
           </label>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               What do you need help with most? (pick any that apply)
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {STUDENT_SUPPORT_NEEDS.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="checkbox"
@@ -427,9 +430,9 @@ export function StudentOnboardingWizard() {
                     onChange={() =>
                       setCommunityPrefs((p) => toggleInList(p, o.value))
                     }
-                    className="size-4 rounded border-slate-300 text-teal-600"
+                    className="size-4 rounded border-zinc-300 accent-zinc-900"
                   />
-                  {o.label}
+                  <span className="text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
@@ -438,7 +441,7 @@ export function StudentOnboardingWizard() {
       )}
 
       {error ? (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-[13px] text-red-600" role="alert">
           {error}
         </p>
       ) : null}
@@ -448,9 +451,9 @@ export function StudentOnboardingWizard() {
           <button
             type="button"
             onClick={() => setStep((s) => s - 1)}
-            className="text-sm font-medium text-teal-800 hover:text-teal-950"
+            className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
           >
-            Back
+            ← Back
           </button>
         ) : (
           <span />
@@ -460,7 +463,7 @@ export function StudentOnboardingWizard() {
             type="button"
             disabled={!canNext()}
             onClick={() => setStep((s) => s + 1)}
-            className="rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-40"
+            className="rounded-lg bg-teal-600 px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-40"
           >
             Continue
           </button>
@@ -469,7 +472,7 @@ export function StudentOnboardingWizard() {
             type="button"
             disabled={!canNext() || pending}
             onClick={submit}
-            className="rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-40"
+            className="rounded-lg bg-teal-600 px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-40"
           >
             {pending ? "Saving…" : "Finish & go to home"}
           </button>

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { ExternalLink, UserRound } from "lucide-react";
 import { redirect } from "next/navigation";

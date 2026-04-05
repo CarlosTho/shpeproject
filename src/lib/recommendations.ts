@@ -1,4 +1,4 @@
-import { getScholarships } from "@/app/scholarships/actions";
+import { getScholarships } from "@/app/(app)/scholarships/actions";
 import { getInternships } from "@/lib/internships/get-internships";
 import type { InternshipListing } from "@/lib/internships/types";
 import prisma from "@/lib/prisma";
@@ -70,6 +70,7 @@ export async function getPersonalizedPicks(
     where: { userId },
     select: {
       onboardingComplete: true,
+      audienceSegment: true,
       interests: true,
       major: true,
       careerPath: true,
@@ -78,6 +79,7 @@ export async function getPersonalizedPicks(
   });
 
   if (!profile?.onboardingComplete) return null;
+  if (profile.audienceSegment !== "student") return null;
 
   const internshipsResult = await getInternships();
   const listings =

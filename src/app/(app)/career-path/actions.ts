@@ -8,7 +8,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { CAREERS } from "@/lib/career-path/careers";
 import { generateStoredPlan } from "@/lib/career-path/generate-roadmap";
-import type { StoredPlan, WizardProfile } from "@/lib/career-path/types";
+import type { StoredPlan, StepProgressData, WizardProfile } from "@/lib/career-path/types";
 import prisma from "@/lib/prisma";
 
 const ALLOWED_CAREERS = new Set(CAREERS.map((c) => c.id));
@@ -22,6 +22,8 @@ const wizardSchema = z.object({
   workStatus: z.enum(["student", "working", "unemployed", "part_time"]),
   experienceLevel: z.enum(["none", "some", "experienced"]),
   hasDegree: z.enum(["yes", "no"]),
+  hoursPerWeek: z.coerce.number().int().min(5).max(20),
+  goalTimeline: z.enum(["3_months", "6_months", "1_year"]),
 });
 
 async function requireUserId() {
@@ -61,6 +63,8 @@ export async function createCareerRoadmap(
     workStatus: formData.get("workStatus"),
     experienceLevel: formData.get("experienceLevel"),
     hasDegree: formData.get("hasDegree"),
+    hoursPerWeek: formData.get("hoursPerWeek"),
+    goalTimeline: formData.get("goalTimeline"),
   });
 
   if (!raw.success) {
@@ -79,6 +83,8 @@ export async function createCareerRoadmap(
     workStatus: raw.data.workStatus,
     experienceLevel: raw.data.experienceLevel,
     hasDegree: raw.data.hasDegree === "yes",
+    hoursPerWeek: raw.data.hoursPerWeek,
+    goalTimeline: raw.data.goalTimeline,
   };
 
   let resumeRef: string | null = null;
@@ -137,18 +143,59 @@ export async function createCareerRoadmap(
   redirect("/career-path/plan");
 }
 
+function parseProgressJson(raw: string): Record<string, StepProgressData> {
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+  const out: Record<string, StepProgressData> = {};
+  for (const [id, val] of Object.entries(parsed)) {
+    if (typeof val === "boolean") {
+      out[id] = { done: val, notes: {} };
+    } else if (typeof val === "object" && val !== null) {
+      const v = val as Partial<StepProgressData>;
+      out[id] = { done: v.done ?? false, notes: v.notes ?? {} };
+    }
+  }
+  return out;
+}
+
 export async function toggleCareerStepCompletion(stepId: string, completed: boolean) {
   const userId = await requireUserId();
   const row = await prisma.careerRoadmap.findUnique({ where: { userId } });
   if (!row) return { ok: false as const };
 
-  let progress: Record<string, boolean> = {};
-  try {
-    progress = JSON.parse(row.progressJson) as Record<string, boolean>;
-  } catch {
-    progress = {};
-  }
-  progress[stepId] = completed;
+  const progress = parseProgressJson(row.progressJson);
+  progress[stepId] = { done: completed, notes: progress[stepId]?.notes ?? {} };
+
+  await prisma.careerRoadmap.update({
+    where: { userId },
+    data: { progressJson: JSON.stringify(progress) },
+  });
+  revalidatePath("/career-path/plan");
+  return { ok: true as const };
+}
+
+export async function saveResourceNote(
+  stepId: string,
+  resourceUrl: string,
+  noteText: string,
+) {
+  const userId = await requireUserId();
+  const row = await prisma.careerRoadmap.findUnique({ where: { userId } });
+  if (!row) return { ok: false as const };
+
+  const progress = parseProgressJson(row.progressJson);
+  const existing = progress[stepId] ?? { done: false, notes: {} };
+  progress[stepId] = {
+    ...existing,
+    notes: {
+      ...existing.notes,
+      [resourceUrl]: { text: noteText, savedAt: new Date().toISOString() },
+    },
+  };
 
   await prisma.careerRoadmap.update({
     where: { userId },
@@ -177,12 +224,7 @@ export async function getCareerRoadmapForViewer() {
   } catch {
     return null;
   }
-  let progress: Record<string, boolean> = {};
-  try {
-    progress = JSON.parse(row.progressJson) as Record<string, boolean>;
-  } catch {
-    progress = {};
-  }
+  const progress = parseProgressJson(row.progressJson);
 
   return {
     id: row.id,

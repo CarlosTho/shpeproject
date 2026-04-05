@@ -1,83 +1,77 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink, Sparkles } from "lucide-react";
 import { getPersonalizedPicks } from "@/lib/recommendations";
 
-type Props = {
-  userId: string;
-};
-
-export async function PersonalizedPicks({ userId }: Props) {
+export async function PersonalizedPicks({ userId }: { userId: string }) {
   const data = await getPersonalizedPicks(userId);
   if (!data) return null;
 
   const hasInternships = data.internships.length > 0;
 
   return (
-    <section className="rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white to-teal-50/50 p-5 shadow-sm ring-1 ring-teal-100">
-      <h2 className="text-sm font-semibold text-slate-900">
-        Picked for you
-      </h2>
-      <p className="mt-1 text-xs text-slate-600">{data.headline}</p>
+    <section className="rounded-xl border border-zinc-200 bg-white p-5">
+      <div className="flex items-center gap-2">
+        <Sparkles className="size-4 text-teal-500" strokeWidth={1.75} />
+        <h2 className="text-[13px] font-semibold text-zinc-900">Picked for you</h2>
+      </div>
+      <p className="mt-0.5 text-[11px] text-zinc-400">{data.headline}</p>
 
       {hasInternships ? (
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-3 space-y-0.5">
           {data.internships.map((row) => (
             <li
               key={`${row.company}-${row.role}-${row.category}`}
-              className="rounded-xl border border-slate-200/80 bg-white/90 px-3 py-2.5"
+              className="group flex items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors hover:bg-zinc-50"
             >
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-900">
-                    {row.company}
-                  </p>
-                  <p className="text-xs text-slate-600">{row.role}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">
-                    {row.location}
-                  </p>
-                </div>
-                {row.applyUrl ? (
-                  <a
-                    href={row.applyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-teal-700 hover:text-teal-800"
-                  >
-                    Apply
-                    <ExternalLink className="size-3.5" aria-hidden />
-                  </a>
-                ) : null}
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-[11px] font-bold text-zinc-600">
+                {row.company.slice(0, 2).toUpperCase()}
               </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[13px] font-medium text-zinc-800">
+                  {row.company}
+                </p>
+                <p className="text-[11px] text-zinc-400">{row.role}</p>
+              </div>
+              {row.applyUrl ? (
+                <a
+                  href={row.applyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex shrink-0 items-center gap-1 rounded-md border border-zinc-200 px-2 py-1 text-[11px] font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
+                >
+                  Apply
+                  <ExternalLink className="size-2.5" aria-hidden />
+                </a>
+              ) : null}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-4 text-sm text-slate-500">
-          We couldn&apos;t load internship listings right now. Check{" "}
-          <Link href="/internship" className="font-medium text-teal-700">
-            Opportunities
-          </Link>{" "}
-          for the full board.
+        <p className="mt-3 text-[13px] text-zinc-400">
+          Couldn&apos;t load listings right now.{" "}
+          <Link href="/internship" className="font-medium text-teal-600 hover:text-teal-700">
+            View all internships
+          </Link>
         </p>
       )}
 
-      {data.showScholarshipsCta && data.scholarshipCount > 0 ? (
-        <div className="mt-4 rounded-xl bg-white/80 px-3 py-3 text-sm text-slate-700 ring-1 ring-slate-100">
-          <p>
-            You said you&apos;re looking for scholarships — we have{" "}
-            <span className="font-semibold tabular-nums">
+      {data.showScholarshipsCta && data.scholarshipCount > 0 && (
+        <div className="mt-3 rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2.5">
+          <p className="text-[12px] text-zinc-600">
+            <span className="font-semibold tabular-nums text-zinc-900">
               {data.scholarshipCount}
             </span>{" "}
-            in the directory.
+            scholarships available matching your profile.
           </p>
           <Link
             href="/scholarships"
-            className="mt-2 inline-flex text-sm font-semibold text-teal-700 hover:text-teal-800"
+            className="mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-teal-600 hover:text-teal-700"
           >
-            Browse scholarships →
+            Browse scholarships
+            <ArrowRight className="size-3" />
           </Link>
         </div>
-      ) : null}
+      )}
     </section>
   );
 }

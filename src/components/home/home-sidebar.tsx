@@ -3,85 +3,85 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Building2,
+  Briefcase,
   Calendar,
-  FileText,
-  Gift,
   GraduationCap,
   Home,
   MapPinned,
   MessageCircle,
-  Target,
   User,
   Users,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { SidebarSignOutWithConfirm } from "@/components/auth/sidebar-sign-out-with-confirm";
 
-const accent = {
-  active: "bg-teal-600 text-white shadow-sm",
-  idle:
-    "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-};
-
-const navItems = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/career-path", label: "Career Path", icon: MapPinned },
-  { href: "/directory", label: "Directory", icon: Users },
-  { href: "/internship", label: "Opportunities", icon: Target },
-  { href: "/events", label: "Events", icon: Calendar },
-  { href: "/scholarships", label: "Scholarships", icon: GraduationCap },
-  { href: "/peer-help", label: "Peer Help", icon: MessageCircle },
-  { href: "/home", label: "Offers", icon: Gift },
-  { href: "/home", label: "Companies", icon: Building2 },
-  { href: "/home", label: "Resume Review", icon: FileText },
-  { href: "/profile", label: "Profile", icon: User },
+const studentNavItems = [
+  { href: "/home",        label: "Home",        icon: Home },
+  { href: "/internship",  label: "Internships",  icon: Briefcase },
+  { href: "/scholarships",label: "Scholarships", icon: GraduationCap },
+  { href: "/events",      label: "Events",       icon: Calendar },
+  { href: "/directory",   label: "Directory",    icon: Users },
+  { href: "/peer-help",   label: "Peer Help",    icon: MessageCircle },
+  { href: "/profile",     label: "Profile",      icon: User },
 ] as const;
 
-function isNavActive(pathname: string, item: (typeof navItems)[number]) {
-  if (item.label === "Home") {
-    return pathname === "/home";
-  }
-  /* Placeholder links still go to /home — don’t highlight them on /home. */
-  if (item.href === "/home") {
-    return false;
-  }
-  if (item.href === "/career-path") {
-    return (
-      pathname === "/career-path" ||
-      pathname.startsWith("/career-path/")
-    );
-  }
+const nonStudentNavItems = [
+  { href: "/home",        label: "Home",         icon: Home },
+  { href: "/career-path", label: "Career Path",  icon: MapPinned },
+  { href: "/events",      label: "Events",       icon: Calendar },
+  { href: "/directory",   label: "Directory",    icon: Users },
+  { href: "/peer-help",   label: "Peer Help",    icon: MessageCircle },
+  { href: "/profile",     label: "Profile",      icon: User },
+] as const;
+
+type NavItem = { href: string; label: string; icon: React.ElementType };
+
+function isNavActive(pathname: string, item: NavItem): boolean {
+  if (item.label === "Home") return pathname === "/home";
+  if (item.href === "/career-path")
+    return pathname === "/career-path" || pathname.startsWith("/career-path/");
   return pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
 export function HomeSidebar({
-  showCareerPathNav = true,
+  audienceSegment,
 }: {
-  showCareerPathNav?: boolean;
+  audienceSegment: "student" | "non_student" | null;
 }) {
   const pathname = usePathname();
-  const items = showCareerPathNav
-    ? navItems
-    : navItems.filter((item) => item.href !== "/career-path");
+  const items: readonly NavItem[] =
+    audienceSegment === "student" ? studentNavItems : nonStudentNavItems;
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white lg:w-72">
-      <div className="flex h-16 items-center gap-2 border-b border-slate-100 px-5">
-        <div className="flex flex-col gap-1" aria-hidden>
-          <span className="h-1 w-7 rounded-full bg-amber-400" />
-          <span className="h-1 w-5 rounded-full bg-amber-400/80" />
-          <span className="h-1 w-6 rounded-full bg-amber-400/60" />
+    <aside className="animate-slide-left flex w-[220px] shrink-0 flex-col border-r border-zinc-200/80 bg-white lg:w-[240px]">
+      {/* Logo */}
+      <div className="flex h-[52px] items-center gap-2.5 border-b border-zinc-100 px-4">
+        <div
+          className="flex size-[26px] items-center justify-center rounded-[6px] bg-zinc-900 text-[11px] font-bold tracking-tight text-white"
+          aria-hidden
+        >
+          P
         </div>
-        <span className="text-lg font-semibold tracking-tight text-slate-900">
+        <span className="text-[13.5px] font-semibold tracking-tight text-zinc-900">
           Prometeo
         </span>
       </div>
 
+      {/* Segment badge */}
+      {audienceSegment && (
+        <div className="px-3 pt-2.5">
+          <span className="inline-flex items-center rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">
+            {audienceSegment === "student" ? "Student" : "Professional"}
+          </span>
+        </div>
+      )}
+
+      {/* Navigation */}
       <nav
-        className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3"
+        className="flex flex-1 flex-col overflow-y-auto px-2 py-2"
         aria-label="Main"
       >
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-px">
           {items.map((item) => {
             const Icon = item.icon;
             const active = isNavActive(pathname, item);
@@ -90,18 +90,31 @@ export function HomeSidebar({
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? accent.active : accent.idle}`}
+                className={cn(
+                  "group flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px] transition-colors duration-150",
+                  active
+                    ? "bg-zinc-100 font-medium text-zinc-900"
+                    : "font-normal text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800"
+                )}
               >
-                <Icon className="size-[18px] shrink-0 opacity-90" strokeWidth={1.75} />
+                <Icon
+                  className={cn(
+                    "size-[15px] shrink-0 transition-colors",
+                    active ? "text-zinc-900" : "text-zinc-400 group-hover:text-zinc-600"
+                  )}
+                  strokeWidth={active ? 2.1 : 1.8}
+                />
                 {item.label}
               </Link>
             );
           })}
         </div>
-        <div className="mt-auto border-t border-slate-100 pt-2">
-          <SidebarSignOutWithConfirm />
-        </div>
       </nav>
+
+      {/* Sign out */}
+      <div className="border-t border-zinc-100 px-2 py-2">
+        <SidebarSignOutWithConfirm />
+      </div>
     </aside>
   );
 }

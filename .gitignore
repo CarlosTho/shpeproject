@@ -45,3 +45,6 @@ next-env.d.ts
 
 # optional resume uploads (Career Path)
 public/uploads/career-resumes
+
+# local agent / harness (do not commit)
+.agents/

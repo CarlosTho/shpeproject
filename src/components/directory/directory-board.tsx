@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { Search } from "lucide-react";
-import type { DirectoryMember } from "@/app/directory/actions";
-import { getDirectoryMembers } from "@/app/directory/actions";
+import type { DirectoryMember } from "@/app/(app)/directory/actions";
+import { getDirectoryMembers } from "@/app/(app)/directory/actions";
 import { profileAccentForUserId } from "@/lib/profile/profile-accent";
+import { cn } from "@/lib/utils";
 
 function initials(name: string) {
   return name
@@ -29,51 +30,50 @@ function MemberCard({
 
   return (
     <article
-      className={`flex gap-4 rounded-xl border p-4 shadow-sm transition hover:shadow-md ${
+      className={cn(
+        "flex gap-3.5 rounded-xl border p-4 transition-colors",
         isSelf
-          ? "border-emerald-200 bg-emerald-50/35 ring-1 ring-emerald-500/25 hover:border-emerald-300"
-          : "border-slate-100 bg-white hover:border-slate-200"
-      }`}
+          ? "border-teal-200 bg-teal-50/40 hover:border-teal-300"
+          : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50/40"
+      )}
       aria-label={isSelf ? `${member.name}, your profile` : undefined}
     >
       {member.image ? (
         <img
           src={member.image}
           alt=""
-          className="size-14 shrink-0 rounded-full object-cover"
+          className="size-10 shrink-0 rounded-full object-cover"
         />
       ) : (
         <div
-          className={`flex size-14 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${accent.directoryInitials}`}
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold",
+            accent.directoryInitials
+          )}
           aria-hidden
         >
           {initials(member.name)}
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <h2 className="flex flex-wrap items-center gap-2 font-semibold text-slate-900">
-          <span>{member.name}</span>
-          {isSelf ? (
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-300/80">
+        <h2 className="flex flex-wrap items-center gap-2">
+          <span className="text-[14px] font-semibold text-zinc-900">{member.name}</span>
+          {isSelf && (
+            <span className="rounded-full bg-teal-100 px-1.5 py-0.5 text-[10px] font-semibold text-teal-700">
               You
             </span>
-          ) : null}
+          )}
         </h2>
         {subtitle && (
-          <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>
+          <p className="mt-0.5 text-[11px] text-zinc-400">{subtitle}</p>
         )}
         {member.bio && (
-          <p className="mt-1 text-sm leading-relaxed text-slate-600">
+          <p className="mt-1 text-[13px] leading-relaxed text-zinc-500">
             {member.bio}
           </p>
         )}
         {member.location && (
-          <p className="mt-1 text-xs text-slate-400">
-            {member.location}
-            {isSelf ? (
-              <span className="font-medium text-emerald-700"> · You</span>
-            ) : null}
-          </p>
+          <p className="mt-1 text-[11px] text-zinc-400">{member.location}</p>
         )}
       </div>
     </article>
@@ -93,48 +93,53 @@ export function DirectoryBoard({ initialMembers, currentUserId }: Props) {
   function handleSearch(value: string) {
     setQ(value);
     startSearch(async () => {
-      const results = await getDirectoryMembers(
-        value || undefined,
-        currentUserId,
-      );
+      const results = await getDirectoryMembers(value || undefined, currentUserId);
       setMembers(results);
     });
   }
 
   return (
-    <div>
-      <div className="mt-6">
+    <div className="animate-fade-up space-y-5">
+      {/* Search */}
+      <div className="relative">
         <label className="sr-only" htmlFor="directory-search">
           Search by name, school, or location
         </label>
-        <div className="relative max-w-3xl">
-          <Search
-            className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-slate-400"
-            strokeWidth={2}
-            aria-hidden
-          />
-          <input
-            id="directory-search"
-            type="search"
-            value={q}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search by name, school, or location..."
-            className="w-full rounded-full border-0 bg-slate-100 py-3.5 pl-12 pr-5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-          />
-        </div>
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
+          strokeWidth={2}
+          aria-hidden
+        />
+        <input
+          id="directory-search"
+          type="search"
+          value={q}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search by name, school, or location…"
+          className="h-9 w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
+        />
       </div>
 
-      <p className="mt-4 text-sm text-slate-500">
-        {searching ? "Searching…" : `${members.length} member${members.length !== 1 ? "s" : ""}`}
+      {/* Count */}
+      <p className="text-[13px] text-zinc-400">
+        {searching ? (
+          "Searching…"
+        ) : (
+          <>
+            <span className="font-semibold text-zinc-700">{members.length}</span>{" "}
+            member{members.length !== 1 ? "s" : ""}
+          </>
+        )}
       </p>
 
+      {/* Grid */}
       <section
-        className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5"
+        className="grid grid-cols-1 gap-3 md:grid-cols-2"
         aria-label="Members"
       >
         {members.length === 0 ? (
-          <div className="col-span-full py-12 text-center">
-            <p className="text-sm text-slate-500">No members found.</p>
+          <div className="col-span-full py-16 text-center">
+            <p className="text-[13px] text-zinc-500">No members found.</p>
           </div>
         ) : (
           members.map((m) => (

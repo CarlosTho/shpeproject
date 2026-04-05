@@ -23,27 +23,27 @@ export function OnboardingAudienceSplit() {
   }
 
   return (
-    <div className="space-y-6 text-slate-900">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="text-[15px] font-semibold text-zinc-900">
           Which best describes you right now?
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-[13px] text-zinc-500">
           We&apos;ll tailor your dashboard, resources, and next steps to your
           situation.
         </p>
       </div>
 
-      <div className="grid gap-3">
+      <div className="grid gap-2.5">
         {AUDIENCE_SEGMENT.map((o) => (
           <button
             key={o.value}
             type="button"
             disabled={pending}
             onClick={() => choose(o.value as "student" | "non_student")}
-            className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900 shadow-sm transition hover:border-teal-300/80 hover:bg-teal-50/40 disabled:opacity-50"
+            className="flex w-full items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-left text-[13px] font-semibold text-zinc-900 transition-colors hover:border-zinc-300 hover:bg-zinc-50 disabled:opacity-50"
           >
-            <span className="text-2xl" aria-hidden>
+            <span className="text-xl" aria-hidden>
               {o.emoji}
             </span>
             <span>{o.label}</span>
@@ -52,7 +52,7 @@ export function OnboardingAudienceSplit() {
       </div>
 
       {error ? (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-[13px] text-red-600" role="alert">
           {error}
         </p>
       ) : null}

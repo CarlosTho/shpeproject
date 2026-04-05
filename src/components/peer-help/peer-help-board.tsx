@@ -4,29 +4,27 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Sun } from "lucide-react";
-import { createPeerHelpRequest } from "@/app/peer-help/actions";
+import { createPeerHelpRequest } from "@/app/(app)/peer-help/actions";
 import {
   PEER_HELP_TYPE_IDS,
   PEER_HELP_TYPE_LABELS,
   type PeerHelpRequestItem,
   type PeerHelpTypeId,
 } from "@/lib/peer-help/types";
+import { cn } from "@/lib/utils";
 
-const typeStyles: Record<
-  PeerHelpTypeId,
-  { label: string; className: string }
-> = {
+const typeStyles: Record<PeerHelpTypeId, { label: string; className: string }> = {
   mock_interview: {
     label: PEER_HELP_TYPE_LABELS.mock_interview,
-    className: "bg-emerald-100 text-emerald-800",
+    className: "bg-teal-50 text-teal-700",
   },
   career_advice: {
     label: PEER_HELP_TYPE_LABELS.career_advice,
-    className: "bg-pink-100 text-pink-800",
+    className: "bg-pink-50 text-pink-700",
   },
   resume_review: {
     label: PEER_HELP_TYPE_LABELS.resume_review,
-    className: "bg-sky-100 text-sky-800",
+    className: "bg-sky-50 text-sky-700",
   },
 };
 
@@ -37,13 +35,7 @@ type Props = {
   autoOpenRequest?: boolean;
 };
 
-function Avatar({
-  name,
-  image,
-}: {
-  name: string;
-  image: string | null;
-}) {
+function Avatar({ name, image }: { name: string; image: string | null }) {
   const initial = name.trim().charAt(0).toUpperCase() || "?";
   if (image) {
     return (
@@ -51,15 +43,15 @@ function Avatar({
       <img
         src={image}
         alt=""
-        width={36}
-        height={36}
-        className="size-9 rounded-full object-cover"
+        width={32}
+        height={32}
+        className="size-8 rounded-full object-cover"
       />
     );
   }
   return (
     <div
-      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-600"
+      className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-[11px] font-semibold text-zinc-600"
       aria-hidden
     >
       {initial}
@@ -76,9 +68,7 @@ export function PeerHelpBoard({
   const router = useRouter();
   const requestDialogRef = useRef<HTMLDialogElement>(null);
   const detailDialogRef = useRef<HTMLDialogElement>(null);
-  const [detailRequest, setDetailRequest] = useState<PeerHelpRequestItem | null>(
-    null,
-  );
+  const [detailRequest, setDetailRequest] = useState<PeerHelpRequestItem | null>(null);
   const [myOnly, setMyOnly] = useState(false);
   const [typeFilter, setTypeFilter] = useState<PeerHelpTypeId | "all">("all");
   const [formError, setFormError] = useState<string | null>(null);
@@ -133,17 +123,18 @@ export function PeerHelpBoard({
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-start sm:justify-between">
+    <div className="animate-fade-up space-y-6">
+      {/* Header */}
+      <header className="flex flex-col gap-4 border-b border-zinc-100 pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
-            <MessageCircle className="size-6" strokeWidth={1.75} />
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500">
+            <MessageCircle className="size-5" strokeWidth={1.75} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-900">
               Peer Help
             </h1>
-            <p className="mt-1 max-w-xl text-sm text-slate-500">
+            <p className="mt-0.5 max-w-xl text-[13px] text-zinc-500">
               Request mock interviews, resume reviews, and career advice from
               your peers — and offer help when you can.
             </p>
@@ -152,100 +143,102 @@ export function PeerHelpBoard({
         <button
           type="button"
           onClick={openRequestDialog}
-          className="inline-flex shrink-0 items-center justify-center rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-teal-600 px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-teal-700"
         >
           Request Help
         </button>
       </header>
 
-      <div className="flex flex-wrap items-center gap-3">
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => setMyOnly((v) => !v)}
-          className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
+          className={cn(
+            "h-8 rounded-lg border px-3 text-[13px] font-medium transition-colors",
             myOnly
-              ? "border-teal-600 bg-teal-50 text-teal-800"
-              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-          }`}
+              ? "border-zinc-900 bg-zinc-900 text-white"
+              : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
+          )}
         >
           My Requests
         </button>
-        <div className="flex items-center gap-2">
-          <label htmlFor="peer-help-type" className="sr-only">
-            Filter by type
-          </label>
-          <select
-            id="peer-help-type"
-            value={typeFilter}
-            onChange={(e) =>
-              setTypeFilter(e.target.value as PeerHelpTypeId | "all")
-            }
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm focus:border-teal-500/40 focus:outline-none focus:ring-2 focus:ring-teal-500/25"
-          >
-            <option value="all">All types</option>
-            {PEER_HELP_TYPE_IDS.map((id) => (
-              <option key={id} value={id}>
-                {PEER_HELP_TYPE_LABELS[id]}
-              </option>
-            ))}
-          </select>
-        </div>
+        <label className="sr-only" htmlFor="peer-help-type">
+          Filter by type
+        </label>
+        <select
+          id="peer-help-type"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as PeerHelpTypeId | "all")}
+          className="h-8 rounded-lg border border-zinc-200 bg-white px-3 text-[13px] font-medium text-zinc-700 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
+        >
+          <option value="all">All types</option>
+          {PEER_HELP_TYPE_IDS.map((id) => (
+            <option key={id} value={id}>
+              {PEER_HELP_TYPE_LABELS[id]}
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Request list */}
       <section>
-        <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900">
+        <h2 className="mb-4 flex items-center gap-2 text-[13px] font-semibold text-zinc-900">
           Open
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-sm font-medium text-slate-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">
             {filtered.length}
           </span>
         </h2>
 
         {filtered.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-12 text-center text-sm text-slate-500">
-            {myOnly
-              ? "You have no open requests yet. Use Request Help to post one."
-              : "No open requests match your filters."}
-          </p>
+          <div className="rounded-xl border border-dashed border-zinc-200 px-6 py-14 text-center">
+            <p className="text-[13px] text-zinc-500">
+              {myOnly
+                ? "You have no open requests yet. Use Request Help to post one."
+                : "No open requests match your filters."}
+            </p>
+          </div>
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((r) => {
               const style = typeStyles[r.type];
               return (
                 <li key={r.id}>
-                  <article className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+                  <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-300">
                     <div className="mb-3 flex items-start justify-between gap-2">
                       <span
-                        className={`inline-block rounded-lg px-2.5 py-1 text-xs font-semibold ${style.className}`}
+                        className={cn(
+                          "inline-block rounded-md px-2 py-0.5 text-[11px] font-semibold",
+                          style.className
+                        )}
                       >
                         {style.label}
                       </span>
                       <button
                         type="button"
                         onClick={() => openDetail(r)}
-                        className="text-sm font-medium text-teal-700 hover:text-teal-800"
+                        className="text-[12px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
                       >
                         View
                       </button>
                     </div>
-                    <div className="mb-3 flex items-center gap-1.5">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
-                        <Sun className="size-3.5" aria-hidden />
+                    <div className="mb-3">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">
+                        <Sun className="size-3" aria-hidden />
                         Open
                       </span>
                     </div>
-                    <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">
+                    <p className="line-clamp-3 flex-1 text-[13px] leading-relaxed text-zinc-600">
                       {r.context}
                     </p>
-                    <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-4 flex items-center gap-2.5 border-t border-zinc-100 pt-3">
                       <Avatar name={r.authorName} image={r.authorImage} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-slate-900">
+                        <p className="truncate text-[13px] font-medium text-zinc-900">
                           {r.authorName}
                         </p>
-                        <p className="text-xs text-slate-500">
-                          {formatDistanceToNow(new Date(r.createdAt), {
-                            addSuffix: true,
-                          })}
+                        <p className="text-[11px] text-zinc-400">
+                          {formatDistanceToNow(new Date(r.createdAt), { addSuffix: true })}
                         </p>
                       </div>
                     </div>
@@ -257,32 +250,33 @@ export function PeerHelpBoard({
         )}
       </section>
 
+      {/* Request dialog */}
       <dialog
         ref={requestDialogRef}
-        className="w-[min(100%,32rem)] rounded-2xl border border-slate-200 p-0 shadow-xl backdrop:bg-slate-900/40"
+        className="w-[min(100%,32rem)] rounded-2xl border border-zinc-200 p-0 shadow-xl backdrop:bg-black/30"
       >
-        <div className="border-b border-slate-100 px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-900">
+        <div className="border-b border-zinc-100 px-6 py-4">
+          <h3 className="text-[15px] font-semibold text-zinc-900">
             Request peer help
           </h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-[13px] text-zinc-500">
             Posts are visible to signed-in members. Be specific so peers can
             decide if they can help.
           </p>
         </div>
         <form onSubmit={handleRequestSubmit} className="px-6 py-4">
           <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-slate-900">
+            <legend className="text-[13px] font-medium text-zinc-900">
               What type of help do you need?
             </legend>
-            <p className="text-xs text-slate-500">
+            <p className="text-[11px] text-zinc-400">
               We currently only support these areas of need.
             </p>
             <div className="flex flex-col gap-2">
               {PEER_HELP_TYPE_IDS.map((id) => (
                 <label
                   key={id}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 px-3 py-2.5 has-[:checked]:border-teal-500/50 has-[:checked]:bg-teal-50/50"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2.5 transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
@@ -291,9 +285,9 @@ export function PeerHelpBoard({
                     checked={requestType === id}
                     onChange={() => setRequestType(id)}
                     required
-                    className="size-4 border-slate-300 text-teal-600 focus:ring-teal-500"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  <span className="text-sm font-medium text-slate-800">
+                  <span className="text-[13px] font-medium text-zinc-800">
                     {PEER_HELP_TYPE_LABELS[id]}
                   </span>
                 </label>
@@ -304,11 +298,11 @@ export function PeerHelpBoard({
           <div className="mt-5">
             <label
               htmlFor="peer-help-context"
-              className="block text-sm font-medium text-slate-900"
+              className="block text-[13px] font-medium text-zinc-900"
             >
-              Please add context to your request
+              Add context to your request
             </label>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-[11px] text-zinc-400">
               What do you need help with specifically? Do you want to meet
               synchronously or asynchronously? If synchronously, when are you
               available? Do you have a preference on the helper&apos;s
@@ -319,21 +313,21 @@ export function PeerHelpBoard({
               name="context"
               required
               rows={6}
-              placeholder="e.g. I’m prepping for a behavioral + technical mock for an SWE internship; prefer async feedback on my answers, or a 30-min video call weekday evenings PT…"
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-teal-500/40 focus:outline-none focus:ring-2 focus:ring-teal-500/25"
+              placeholder="e.g. I'm prepping for a behavioral + technical mock for an SWE internship; prefer async feedback on my answers, or a 30-min video call weekday evenings PT…"
+              className="mt-2 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
             />
           </div>
 
           {formError && (
-            <p className="mt-3 text-sm text-red-600" role="alert">
+            <p className="mt-3 text-[13px] text-red-600" role="alert">
               {formError}
             </p>
           )}
 
-          <div className="mt-6 flex justify-end gap-2 border-t border-slate-100 pt-4">
+          <div className="mt-6 flex justify-end gap-2 border-t border-zinc-100 pt-4">
             <button
               type="button"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              className="rounded-lg px-4 py-2 text-[13px] font-medium text-zinc-600 transition-colors hover:bg-zinc-100"
               onClick={() => requestDialogRef.current?.close()}
             >
               Cancel
@@ -341,7 +335,7 @@ export function PeerHelpBoard({
             <button
               type="submit"
               disabled={pending}
-              className="rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
+              className="rounded-lg bg-teal-600 px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-60"
             >
               {pending ? "Posting…" : "Post request"}
             </button>
@@ -349,51 +343,50 @@ export function PeerHelpBoard({
         </form>
       </dialog>
 
+      {/* Detail dialog */}
       <dialog
         ref={detailDialogRef}
-        className="w-[min(100%,36rem)] rounded-2xl border border-slate-200 p-0 shadow-xl backdrop:bg-slate-900/40"
+        className="w-[min(100%,36rem)] rounded-2xl border border-zinc-200 p-0 shadow-xl backdrop:bg-black/30"
         onClose={() => setDetailRequest(null)}
       >
         {detailRequest && (
           <>
-            <div className="border-b border-slate-100 px-6 py-4">
+            <div className="border-b border-zinc-100 px-6 py-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span
-                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${typeStyles[detailRequest.type].className}`}
+                  className={cn(
+                    "rounded-md px-2 py-0.5 text-[11px] font-semibold",
+                    typeStyles[detailRequest.type].className
+                  )}
                 >
                   {typeStyles[detailRequest.type].label}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
-                  <Sun className="size-3.5" aria-hidden />
+                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-500">
+                  <Sun className="size-3" aria-hidden />
                   Open
                 </span>
               </div>
-              <div className="mt-3 flex items-center gap-2">
-                <Avatar
-                  name={detailRequest.authorName}
-                  image={detailRequest.authorImage}
-                />
+              <div className="mt-3 flex items-center gap-2.5">
+                <Avatar name={detailRequest.authorName} image={detailRequest.authorImage} />
                 <div>
-                  <p className="text-sm font-medium text-slate-900">
+                  <p className="text-[13px] font-medium text-zinc-900">
                     {detailRequest.authorName}
                   </p>
-                  <p className="text-xs text-slate-500">
-                    {formatDistanceToNow(new Date(detailRequest.createdAt), {
-                      addSuffix: true,
-                    })}
+                  <p className="text-[11px] text-zinc-400">
+                    {formatDistanceToNow(new Date(detailRequest.createdAt), { addSuffix: true })}
                   </p>
                 </div>
               </div>
             </div>
             <div className="max-h-[min(60vh,28rem)] overflow-y-auto px-6 py-4">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+              <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-zinc-700">
                 {detailRequest.context}
               </p>
             </div>
-            <div className="border-t border-slate-100 px-6 py-4">
+            <div className="border-t border-zinc-100 px-6 py-4">
               <button
                 type="button"
-                className="w-full rounded-xl bg-slate-100 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-200"
+                className="w-full rounded-lg bg-zinc-100 py-2.5 text-[13px] font-medium text-zinc-800 transition-colors hover:bg-zinc-200"
                 onClick={() => detailDialogRef.current?.close()}
               >
                 Close

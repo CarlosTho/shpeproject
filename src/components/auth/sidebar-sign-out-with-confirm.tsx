@@ -6,7 +6,7 @@ import { LogOut } from "lucide-react";
 import { signOutAction } from "@/app/actions/auth";
 
 const triggerClass =
-  "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900";
+  "flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[13px] font-normal text-zinc-400 transition-colors duration-150 hover:bg-zinc-50 hover:text-zinc-700";
 
 function ConfirmActions({ onNo }: { onNo: () => void }) {
   const { pending } = useFormStatus();
@@ -46,7 +46,7 @@ export function SidebarSignOutWithConfirm() {
   return (
     <>
       <button type="button" onClick={open} className={triggerClass}>
-        <LogOut className="size-[18px] shrink-0 opacity-90" strokeWidth={1.75} />
+        <LogOut className="size-[15px] shrink-0 text-zinc-400" strokeWidth={1.8} />
         Log out
       </button>
 
@@ -57,11 +57,11 @@ export function SidebarSignOutWithConfirm() {
       >
         <h2
           id="logout-confirm-title"
-          className="text-lg font-semibold tracking-tight text-slate-900"
+          className="text-center text-lg font-semibold tracking-tight text-slate-900"
         >
           Log out?
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+        <p className="mt-2 text-center text-sm leading-relaxed text-slate-600">
           Are you sure you want to log out? You can sign in again anytime.
         </p>
         <form action={signOutAction}>

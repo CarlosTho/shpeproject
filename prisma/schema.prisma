@@ -9,61 +9,44 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ─── AUTH ────────────────────────────────────────
-
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  image         String?
+  id               String             @id @default(cuid())
+  email            String             @unique
+  name             String?
+  image            String?
+  emailVerified    DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   /// bcrypt hash; null for OAuth-only accounts
-  passwordHash  String?
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  profile      Profile?
-  accounts     Account[]
-  sessions     Session[]
-  points       PointEntry[]
-  questions    PeerQuestion[]
-  answers      PeerAnswer[]
-  offers       Offer[]
-  eventRsvps   EventRsvp[]
-  translations VideoTranslation[]
-  savedOpps         SavedOpportunity[]
-  peerHelpRequests  PeerHelpRequest[]
-  careerRoadmap     CareerRoadmap?
+  passwordHash     String?
+  accounts         Account[]
+  careerRoadmap    CareerRoadmap?
+  eventRsvps       EventRsvp[]
+  peerHelpRequests PeerHelpRequest[]
+  profile          Profile?
+  sessions         Session[]
 }
 
-// ─── CAREER PATH GENERATOR (PUENTE) ─
-
 model CareerRoadmap {
-  id     String @id @default(cuid())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id            String   @id @default(cuid())
+  userId        String   @unique
   /// Up to 2 career slugs, e.g. ["it_support","data_analyst"]
-  careers String[]
-
-  ageRange    String
-  workStatus  String
-  expLevel    String
-  hasDegree   Boolean
+  careers       String[]
+  ageRange      String
+  workStatus    String
+  expLevel      String
+  hasDegree     Boolean
   /// Stored path under /uploads/career-resumes or external URL
-  resumeRef String?
-
+  resumeRef     String?
   timelineLabel String
   goalStatement String
-
   /// JSON: { sections: { careerId, label, steps: RoadmapStep[] }[] }
-  planJson String
-
+  planJson      String
   /// JSON: Record<stepId, boolean>
-  progressJson String @default("{}")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  progressJson  String   @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -79,8 +62,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -101,164 +83,49 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ─── PROFILE (PUENTE-style onboarding + matching) ─
-
 model Profile {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  onboardingComplete Boolean  @default(false)
-
-  bio String?
-
-  school     String?
-  education  String?
-  major      String?
-  gradYear   String?
-  location   String?
-
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  bio                   String?
+  school                String?
+  major                 String?
+  gradYear              String?
+  location              String?
+  linkedin              String?
+  github                String?
+  interests             String[] @default([])
   languages             String[] @default([])
+  userType              String   @default("student")
+  onboardingComplete    Boolean  @default(false)
+  education             String?
   firstGen              Boolean?
   internationalOrDaca   Boolean?
-
-  careerPath String?
-  interests              String[] @default([])
-
+  careerPath            String?
   receivingScholarships Boolean?
   scholarshipDetails    String?
   seekingScholarships   Boolean?
-
-  experienceLevel String?
-
-  linkedin  String?
-  github    String?
-  portfolio String?
-
-  communityPrefs String[] @default([])
-
-  learningStyle        String?
-  preferredContentLang String?
-
-  challenges String?
-  yearlyGoal String?
-
-  userType String @default("student")
-
-  /// Root onboarding split: tailored student vs career-transition experience
-  audienceSegment String?
-  /// Shared across both flows (6-month focus for AI / roadmap)
-  sixMonthGoal String?
-
-  /// Student path
-  studentFieldInterest String?
-  studentPrimaryGoal   String?
-
+  experienceLevel       String?
+  portfolio             String?
+  communityPrefs        String[] @default([])
+  learningStyle         String?
+  preferredContentLang  String?
+  challenges            String?
+  yearlyGoal            String?
   /// Non-student path
-  ageRange            String?
-  nonStudentSituation String?
-  careerIntentText    String?
-  targetCareerSlugs   String[] @default([])
-  primaryBarrier      String?
-  hasCollegeDegree    Boolean?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// ─── OPPORTUNITIES ───────────────────────────────
-
-model Opportunity {
-  id          String    @id @default(cuid())
-  title       String
-  company     String
-  type        String
-  description String?
-  link        String
-  deadline    DateTime?
-  tags        String[]
-  language    String    @default("EN")
-  createdAt   DateTime  @default(now())
-  postedBy    String?
-
-  savedBy SavedOpportunity[]
-}
-
-model SavedOpportunity {
-  id            String   @id @default(cuid())
-  userId        String
-  opportunityId String
-  savedAt       DateTime @default(now())
-
-  user        User        @relation(fields: [userId], references: [id])
-  opportunity Opportunity @relation(fields: [opportunityId], references: [id])
-
-  @@unique([userId, opportunityId])
-}
-
-// ─── OFFERS ──────────────────────────────────────
-
-model Offer {
-  id           String   @id @default(cuid())
-  userId       String
-  company      String
-  role         String
-  compensation String?
-  location     String?
-  type         String
-  rating       Int      @default(5)
-  review       String?
-  anonymous    Boolean  @default(true)
-  createdAt    DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-// ─── COMPANIES ───────────────────────────────────
-
-model Company {
-  id      String  @id @default(cuid())
-  name    String  @unique
-  logo    String?
-  tier    String  @default("Community")
-  website String?
-  roles   Int     @default(0)
-}
-
-// ─── RESOURCES ───────────────────────────────────
-
-model Resource {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  category    String
-  type        String
-  link        String
-  language    String   @default("EN")
-  downloads   Int      @default(0)
-  createdAt   DateTime @default(now())
-}
-
-// ─── PEER HELP ───────────────────────────────────
-
-model PeerQuestion {
-  id        String   @id @default(cuid())
-  userId    String
-  question  String
-  tags      String[]
-  createdAt DateTime @default(now())
-
-  user    User         @relation(fields: [userId], references: [id])
-  answers PeerAnswer[]
-}
-
-model PeerAnswer {
-  id         String   @id @default(cuid())
-  questionId String
-  userId     String
-  answer     String
-  upvotes    Int      @default(0)
-  createdAt  DateTime @default(now())
-
-  question PeerQuestion @relation(fields: [questionId], references: [id])
-  user     User         @relation(fields: [userId], references: [id])
+  ageRange              String?
+  /// Root onboarding split: tailored student vs career-transition experience
+  audienceSegment       String?
+  careerIntentText      String?
+  hasCollegeDegree      Boolean?
+  nonStudentSituation   String?
+  primaryBarrier        String?
+  /// Shared across both flows (6-month focus for AI / roadmap)
+  sixMonthGoal          String?
+  /// Student path
+  studentFieldInterest  String?
+  studentPrimaryGoal    String?
+  targetCareerSlugs     String[] @default([])
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 /// Student-to-student help requests (mock interviews, resume review, career advice).
@@ -272,53 +139,35 @@ model PeerHelpRequest {
   status    String   @default("open")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([type])
   @@index([createdAt])
 }
 
-// ─── POINTS / GAMIFICATION ───────────────────────
-
-model PointEntry {
-  id        String   @id @default(cuid())
-  userId    String
-  points    Int
-  reason    String
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-// ─── EVENTS ──────────────────────────────────────
 
 model Event {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   title     String
   date      DateTime
   endDate   DateTime?
   type      String
   link      String?
   location  String?
-  attendees Int       @default(0)
-
-  rsvps EventRsvp[]
+  attendees Int         @default(0)
+  rsvps     EventRsvp[]
 }
 
 model EventRsvp {
   id      String @id @default(cuid())
   userId  String
   eventId String
-
-  user  User  @relation(fields: [userId], references: [id])
-  event Event @relation(fields: [eventId], references: [id])
+  event   Event  @relation(fields: [eventId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
 
   @@unique([userId, eventId])
 }
-
-// ─── SCHOLARSHIPS ────────────────────────────────
 
 model Scholarship {
   id               String    @id @default(cuid())
@@ -335,22 +184,3 @@ model Scholarship {
   createdAt        DateTime  @default(now())
 }
 
-// ─── VIDEO TRANSLATOR ────────────────────────────
-
-model VideoTranslation {
-  id           String    @id @default(cuid())
-  userId       String
-  youtubeUrl   String
-  youtubeTitle String?
-  sourceLang   String    @default("en")
-  targetLang   String    @default("es")
-  status       String    @default("pending")
-  dubbingId    String?
-  audioUrl     String?
-  transcript   String?
-  duration     Int?
-  createdAt    DateTime  @default(now())
-  completedAt  DateTime?
-
-  user User @relation(fields: [userId], references: [id])
-}

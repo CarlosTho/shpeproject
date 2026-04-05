@@ -13,6 +13,7 @@ import {
   NON_STUDENT_SITUATION,
   NON_STUDENT_SUPPORT_NEEDS,
 } from "@/lib/onboarding/options";
+import { cn } from "@/lib/utils";
 
 const STEPS = [
   "About you",
@@ -25,48 +26,47 @@ function toggleInList(list: string[], item: string): string[] {
   return list.includes(item) ? list.filter((x) => x !== item) : [...list, item];
 }
 
+const inputClass =
+  "mt-1.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200";
+
 function difficultyStyles(d: CareerDefinition["difficulty"]) {
   switch (d) {
     case "easiest":
-      return "border-emerald-200 bg-emerald-50/60 text-emerald-900";
+      return "border-teal-100 bg-teal-50/50 text-teal-900";
     case "medium":
-      return "border-amber-200 bg-amber-50/60 text-amber-950";
+      return "border-amber-100 bg-amber-50/50 text-amber-950";
     case "harder":
-      return "border-violet-200 bg-violet-50/60 text-violet-950";
+      return "border-violet-100 bg-violet-50/50 text-violet-950";
     default:
-      return "border-slate-200 bg-slate-50 text-slate-900";
+      return "border-zinc-200 bg-zinc-50 text-zinc-900";
   }
 }
 
 function difficultyLabel(d: CareerDefinition["difficulty"]) {
   switch (d) {
-    case "easiest":
-      return "Easiest";
-    case "medium":
-      return "Medium";
-    case "harder":
-      return "Harder";
-    default:
-      return d;
+    case "easiest":  return "Easiest";
+    case "medium":   return "Medium";
+    case "harder":   return "Harder";
+    default:         return d;
   }
 }
 
 function Progress({ step }: { step: number }) {
   return (
-    <div className="mb-8 text-slate-900">
-      <div className="mb-2 flex flex-wrap justify-between gap-1 text-[0.65rem] font-medium sm:text-xs">
+    <div className="mb-8">
+      <div className="mb-2 flex flex-wrap justify-between gap-1 text-[11px] font-medium">
         {STEPS.map((label, i) => (
           <span
             key={label}
-            className={i <= step ? "text-teal-800" : "text-slate-500"}
+            className={i <= step ? "text-zinc-900" : "text-zinc-400"}
           >
             {i + 1}. {label}
           </span>
         ))}
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100">
         <div
-          className="h-full rounded-full bg-teal-600 transition-all duration-300"
+          className="h-full rounded-full bg-teal-500 transition-all duration-300"
           style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
         />
       </div>
@@ -113,7 +113,7 @@ export function NonStudentOnboardingWizard() {
   function renderGroup(label: string, items: CareerDefinition[]) {
     return (
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
           {label}
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -124,14 +124,18 @@ export function NonStudentOnboardingWizard() {
                 key={c.id}
                 type="button"
                 onClick={() => toggleCareer(c.id)}
-                className={`flex flex-col items-start rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition ${difficultyStyles(c.difficulty)} ${
-                  on ? "ring-2 ring-teal-500 ring-offset-2" : "hover:opacity-95"
-                }`}
+                className={cn(
+                  "flex flex-col items-start rounded-xl border px-4 py-3 text-left text-[13px] font-medium transition-colors",
+                  difficultyStyles(c.difficulty),
+                  on
+                    ? "ring-2 ring-zinc-900 ring-offset-2"
+                    : "hover:opacity-90"
+                )}
               >
-                <span className="text-[0.6rem] font-semibold uppercase tracking-wide opacity-80">
+                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-60">
                   {difficultyLabel(c.difficulty)}
                 </span>
-                <span className="mt-0.5">{c.label}</span>
+                <span className="mt-1">{c.label}</span>
               </button>
             );
           })}
@@ -193,22 +197,20 @@ export function NonStudentOnboardingWizard() {
   }
 
   return (
-    <div className="space-y-2 text-slate-900">
+    <div className="animate-fade-up space-y-2 text-zinc-900">
       <Progress step={step} />
 
       {step === 0 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">About you</h2>
-          <label className="block text-sm font-medium text-slate-700">
+          <h2 className="text-[15px] font-semibold text-zinc-900">About you</h2>
+          <label className="block text-[13px] font-medium text-zinc-800">
             Age range (optional)
             <select
               value={ageRange}
               onChange={(e) =>
-                setAgeRange(
-                  e.target.value as typeof ageRange,
-                )
+                setAgeRange(e.target.value as typeof ageRange)
               }
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+              className={inputClass}
             >
               {AGE_RANGE_OPTIONS.map((o) => (
                 <option key={o.value || "skip"} value={o.value}>
@@ -218,14 +220,14 @@ export function NonStudentOnboardingWizard() {
             </select>
           </label>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               Preferred language
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {CONTENT_LANG_PREFS.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
@@ -236,20 +238,20 @@ export function NonStudentOnboardingWizard() {
                         o.value as "english" | "spanish" | "both",
                       )
                     }
-                    className="size-4 border-slate-300 text-teal-600"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  <span className="text-sm">{o.label}</span>
+                  <span className="text-[13px] text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             What are you trying to achieve in the next 6 months?
             <textarea
               value={sixMonthGoal}
               onChange={(e) => setSixMonthGoal(e.target.value)}
               rows={3}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className="mt-1.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
               placeholder="e.g. Land a full-time role in IT support, or switch from retail to digital marketing."
             />
           </label>
@@ -258,37 +260,37 @@ export function NonStudentOnboardingWizard() {
 
       {step === 1 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-[15px] font-semibold text-zinc-900">
             Current situation
           </h2>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               What are you currently doing?
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {NON_STUDENT_SITUATION.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
                     name="sit"
                     checked={nonStudentSituation === o.value}
                     onChange={() => setNonStudentSituation(o.value)}
-                    className="size-4 border-slate-300 text-teal-600"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  {o.label}
+                  <span className="text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Experience level in any field
             <select
               value={experienceLevel}
               onChange={(e) => setExperienceLevel(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+              className={inputClass}
             >
               <option value="">Select…</option>
               {NON_STUDENT_EXPERIENCE.map((o) => (
@@ -299,27 +301,27 @@ export function NonStudentOnboardingWizard() {
             </select>
           </label>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               Do you have a college degree?
             </legend>
-            <div className="mt-2 flex flex-wrap gap-4">
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <div className="mt-2.5 flex flex-wrap gap-4">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="deg"
                   checked={hasCollegeDegree === true}
                   onChange={() => setHasCollegeDegree(true)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 Yes
               </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-zinc-700">
                 <input
                   type="radio"
                   name="deg"
                   checked={hasCollegeDegree === false}
                   onChange={() => setHasCollegeDegree(false)}
-                  className="size-4 border-slate-300 text-teal-600"
+                  className="size-4 border-zinc-300 accent-zinc-900"
                 />
                 No
               </label>
@@ -330,19 +332,19 @@ export function NonStudentOnboardingWizard() {
 
       {step === 2 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-[15px] font-semibold text-zinc-900">
             Career intent
           </h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-[13px] text-zinc-500">
             Pick up to two paths below, describe your goal in your own words,
             or both.
           </p>
           {renderGroup("Easiest to enter", easiest)}
           {renderGroup("Medium", medium)}
           {renderGroup("Harder (more learning curve)", harder)}
-          <p className="text-xs text-slate-500">
+          <p className="text-[12px] text-zinc-500">
             Selected:{" "}
-            <span className="font-medium text-slate-800">
+            <span className="font-medium text-zinc-800">
               {targetCareerSlugs.length === 0
                 ? "None yet"
                 : targetCareerSlugs
@@ -350,13 +352,13 @@ export function NonStudentOnboardingWizard() {
                     .join(" + ")}
             </span>
           </p>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Or type what you want to do (optional)
             <textarea
               value={careerIntentText}
               onChange={(e) => setCareerIntentText(e.target.value)}
               rows={2}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className="mt-1.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
               placeholder="Anything we should know about your target role or industry"
             />
           </label>
@@ -365,49 +367,49 @@ export function NonStudentOnboardingWizard() {
 
       {step === 3 && (
         <div className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-[15px] font-semibold text-zinc-900">
             Barriers & support
           </h2>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               What&apos;s your biggest challenge right now?
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {NON_STUDENT_BARRIERS.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="radio"
                     name="barrier"
                     checked={primaryBarrier === o.value}
                     onChange={() => setPrimaryBarrier(o.value)}
-                    className="size-4 border-slate-300 text-teal-600"
+                    className="size-4 border-zinc-300 accent-zinc-900"
                   />
-                  {o.label}
+                  <span className="text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-[13px] font-medium text-zinc-800">
             Where are you based?
             <input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400"
+              className={inputClass}
               placeholder="City, state, or country"
             />
           </label>
           <fieldset>
-            <legend className="text-sm font-medium text-slate-700">
+            <legend className="text-[13px] font-medium text-zinc-800">
               What do you need help with? (pick any that apply)
             </legend>
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="mt-2.5 flex flex-col gap-2">
               {NON_STUDENT_SUPPORT_NEEDS.map((o) => (
                 <label
                   key={o.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm has-[:checked]:border-teal-400/60 has-[:checked]:bg-teal-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px] transition-colors has-[:checked]:border-zinc-400 has-[:checked]:bg-zinc-50"
                 >
                   <input
                     type="checkbox"
@@ -415,9 +417,9 @@ export function NonStudentOnboardingWizard() {
                     onChange={() =>
                       setCommunityPrefs((p) => toggleInList(p, o.value))
                     }
-                    className="size-4 rounded border-slate-300 text-teal-600"
+                    className="size-4 rounded border-zinc-300 accent-zinc-900"
                   />
-                  {o.label}
+                  <span className="text-zinc-800">{o.label}</span>
                 </label>
               ))}
             </div>
@@ -426,7 +428,7 @@ export function NonStudentOnboardingWizard() {
       )}
 
       {error ? (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-[13px] text-red-600" role="alert">
           {error}
         </p>
       ) : null}
@@ -436,9 +438,9 @@ export function NonStudentOnboardingWizard() {
           <button
             type="button"
             onClick={() => setStep((s) => s - 1)}
-            className="text-sm font-medium text-teal-800 hover:text-teal-950"
+            className="text-[13px] font-medium text-zinc-500 transition-colors hover:text-zinc-900"
           >
-            Back
+            ← Back
           </button>
         ) : (
           <span />
@@ -448,7 +450,7 @@ export function NonStudentOnboardingWizard() {
             type="button"
             disabled={!canNext()}
             onClick={() => setStep((s) => s + 1)}
-            className="rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-40"
+            className="rounded-lg bg-teal-600 px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-40"
           >
             Continue
           </button>
@@ -457,7 +459,7 @@ export function NonStudentOnboardingWizard() {
             type="button"
             disabled={!canNext() || pending}
             onClick={submit}
-            className="rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:opacity-40"
+            className="rounded-lg bg-teal-600 px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-40"
           >
             {pending ? "Saving…" : "Finish & open Career Path"}
           </button>

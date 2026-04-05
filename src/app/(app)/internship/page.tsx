@@ -1,9 +1,25 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { auth } from "@/auth";
 import { InternshipBoard } from "@/components/internships/internship-board";
 import { getInternships } from "@/lib/internships/get-internships";
+import prisma from "@/lib/prisma";
 
 export default async function InternshipPage() {
+  const session = await auth();
+  if (session?.user?.id) {
+    const profile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+      select: { audienceSegment: true },
+    });
+    if (profile?.audienceSegment === "non_student") {
+      redirect("/home");
+    }
+  }
+
   const result = await getInternships();
 
   const notice: ReactNode | undefined = result.ok
